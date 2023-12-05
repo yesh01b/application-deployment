@@ -1,0 +1,571 @@
+trigger: none
+pr: none
+
+pool:
+  vmimage: windows-latest
+
+resources:
+  repositories:
+    - repository: genericIngestionFramework
+      type: github
+      name: AsdaUK-Data-asda/genericIngestionFramework
+      endpoint: AsdaUK-Data-asda
+      ref: dev
+    - repository: EDM-framework
+      type: github
+      name: AsdaUK-Data-asda/EDM-framework
+      endpoint: AsdaUK-Data-asda
+      ref: dev
+    - repository: 3party_scripts
+      type: github
+      name: AsdaUK-Data-asda/3party_scripts
+      endpoint: AsdaUK-Data-asda
+      ref: dev
+    - repository: jarvisRawVault
+      type: github
+      name: AsdaUK-Data-asda/jarvisRawVault
+      endpoint: AsdaUK-Data-asda
+      ref: dev     
+    - repository: genericIngestionFramework
+      type: github
+      name: AsdaUK-Data-asda/genericIngestionFramework
+      endpoint: AsdaUK-Data-asda
+      ref: main
+    - repository: jarvisRawVault
+      type: github
+      name: AsdaUK-Data-asda/jarvisRawVault
+      endpoint: AsdaUK-Data-asda
+      ref: main
+
+    - repository: genericAuditingReporting
+      type: github
+      name: AsdaUK-Data-asda/genericAuditingReporting
+      endpoint: AsdaUK-Data-asda
+      ref: main
+    - repository: jarvisInfoMart
+      type: github
+      name: AsdaUK-Data-asda/jarvisInfoMart
+      endpoint: AsdaUK-Data-asda
+      ref: dev  
+
+stages:
+  ## Test UKS genericIngestionFramework scripts deployment
+  - stage: Test_UKS_GenericIngestion_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment
+        steps:
+          - checkout: genericIngestionFramework
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: scripts/genericIngestion/
+              databricksPath: /scripts/genericIngestion
+
+  ## Test UKS genericIngestionFramework reports deployment
+  - stage: Test_UKS_GenericIngestionReport_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment_reports
+        steps:
+          - checkout: genericIngestionFramework
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks Report deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: reports
+              databricksPath: /scripts/reports/
+
+  ## Test UKS EDM-framework scripts deployment
+  - stage: Test_UKS_EIM_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment
+        steps:
+          - checkout: EDM-framework
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: scripts/eim
+              databricksPath: /scripts/eim
+
+  ## Test UKS 3rdparty Shunter Management Scripts  deployment
+  - stage: Test_UKS_3rdparty_Scripts_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks 3rdparty Notebooks deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: quintic/Shuntermanagement
+              databricksPath: /3rdparty/quintic/Shuntermanagement
+
+    ## Test UKS 3rdparty BY Scripts  deployment
+  - stage: Test_UKS_3rdparty_Scripts_BY_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks 3rdparty Notebooks deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: blueyonder/future-forecasting/pySpark-script
+              databricksPath: /3rdparty/blueyonder/future-forecasting/pySpark-script
+
+  ## Test UKS Mod Planning scripts deployment
+  - stage: Test_UKS_Mod_planning_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks Mod planning deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: mod-planning/python-scripts
+              databricksPath: /3rdparty/byModPlanning
+
+  ## Test UKS Retail POS scripts deployment
+  - stage: Test_UKS_Retail_POS_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks Retail POS deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(tenant_id_test)"
+              region: uksouth
+              localPath: 3party_scripts/retailPOS/pyspark-scripts
+              databricksPath: /3rdparty/retailPOS
+  ## Test ScanAndGo -sng  scripts deployment
+  - stage: Test_ScanAndGo_Deployment
+    jobs:
+      - job: test_uks_ScanAndGo_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks ScanAndGo deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(tenant_id_test)"
+              region: uksouth
+              localPath: sng
+              databricksPath: /3rdparty/sng
+
+  ## Test UKS genericAuditingReporting scripts deployment
+  - stage: Test_UKS_GenericAuditingReporting_Deployment
+    jobs:
+      - job: test_uks_Databricks_deployment
+        steps:
+          - checkout: genericAuditingReporting
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(tenant_id_test)"
+              region: uksouth
+              localPath: audit/sourceDataValidation/rdl
+              databricksPath: /audit/sourceDataValidation/rdl
+  ################### jarvisInfoMart
+  ## Test UKS jarvisInfoMart Dimentions deployment
+  - stage: Test_jarvisInfoMart_Dimentions_Deployment
+    jobs:
+      - job: test_uks_jarvisInfoMart_Dimentions_deployment
+        steps:
+          - checkout: jarvisInfoMart
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "jarvisInfoMart Dimentions Databricks Notebooks deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: informationMart/scripts/dimensions/sap/i0743
+              databricksPath: /3rdparty/sap/info-mart/anaplan
+
+  ## Test UKS jarvisInfoMart Facts deployment
+  - stage: Test_jarvisInfoMart_Facts_Deployment
+    jobs:
+      - job: test_uks_jarvisInfoMart_Facts_deployment
+        steps:
+          - checkout: jarvisInfoMart
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "jarvisInfoMart Facts Databricks Notebooks Report deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: informationMart/scripts/facts/sap/i0743
+              databricksPath: /3rdparty/sap/info-mart/anaplan
+
+  ## Test UKS jarvisInfoMart Utils deployment
+  - stage: Test_jarvisInfoMart_Utils_Deployment
+    jobs:
+      - job: test_uks_jarvisInfoMart_Utils_deployment
+        steps:
+          - checkout: jarvisInfoMart
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "jarvisInfoMart Utils Databricks Notebooks Report deployment test"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(test_uks_rg)"
+              workspace: "$(test_uks_workspace)"
+              subscriptionId: "$(test_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: informationMart/scripts/utils/sap/i0743
+              databricksPath: /3rdparty/sap/sapdi
+
+  ###################jarvisInfoMart
+  ## Stage deployments
+  ## stage UKS genericIngestionFramework scripts deployment
+  - stage: Stage_UKS_GenericIngestion_Deployment
+    jobs:
+      - job: stage_uks_Databricks_deployment
+        steps:
+          - checkout: genericIngestionFramework
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks deployment stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: scripts/
+              databricksPath: /scripts
+   
+  ## stage UKS genericIngestionFramework reports deployment
+  - stage: Stage_UKS_GenericIngestionReprts_Deployment
+    jobs:
+      - job: stage_uks_DatabricksReports_deployment
+        steps:
+          - checkout: genericIngestionFramework
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Ingestion Reports Notebooks deployment stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: scripts/genericIngestion/
+              databricksPath: /scripts/genericIngestion
+
+  ## Stage UKS EDM-framework scripts deployment
+  - stage: Stage_UKS_EIM_Deployment
+    jobs:
+      - job: Stage_uks_Databricks_deployment
+        steps:
+          - checkout: EDM-framework
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks deployment stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: scripts/eim
+              databricksPath: /scripts/eim
+
+    ## Stgae UKS 3rdparty Quintic Shunter Management Scripts  deployment
+  - stage: Stage_UKS_3rdparty_Quintic_Scripts_Deployment
+    jobs:
+      - job: stage_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks 3rdparty Quintic Shunter Managemnet Notebooks deployment Stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: quintic/Shuntermanagement
+              databricksPath: /3rdparty/quintic/Shuntermanagement
+
+  ## Stage UKS Mod Planning scripts deployment
+  - stage: Stage_UKS_Mod_planning_Deployment
+    jobs:
+      - job: Stage_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks Mod planning deployment stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: mod-planning/python-scripts
+              databricksPath: /3rdparty/byModPlanning
+   ## Stage UKS 3rdparty BY Scripts  deployment
+  - stage: Stag_UKS_3rdparty_Scripts_BY_Deployment
+    jobs:
+      - job: stag_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks 3rdparty Notebooks deployment stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: workforceManagement/python-scripts
+              databricksPath: /3rdparty/blueyonder/workforceManagement/python-scripts
+ 
+    ## Stgae UKS 3rdparty Quintic Plan Data  Scripts  deployment
+  - stage: Stage_UKS_3rdparty_Quintic_PlanData_Scripts_Deployment
+    jobs:
+      - job: stage_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks 3rdparty Quintic Plan Data  Notebooks deployment Stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: quintic/PlanData/PySpark-Script
+              databricksPath: /3rdparty/quintic/PlanData/PySpark-Script
+
+
+  ## Stage UKS Jarvis Scripts  deployment
+  - stage: Stage_UKS_Jarvis_Scripts_Deployment
+    jobs:
+      - job: stage_uks_DatabricksJarvis_deployment
+        steps:
+          - checkout: jarvisrawvault
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Jarvis  Notebooks deployment Stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: rvCustomModules
+              databricksPath: /rvCustomModules
+
+  ## Stage UKS Retail POS scripts deployment
+  - stage: Stage_UKS_Retail_POS_Deployment
+    jobs:
+      - job: stage_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks Retail POS deployment stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: retailPOS/pyspark-scripts
+              databricksPath: /3rdparty/retailPOS      
+
+  ## stage UKS genericAuditingReporting scripts deployment
+  - stage: Stage_UKS_GenericAuditingReporting_Deployment
+    jobs:
+      - job: stage_uks_Databricks_deployment
+        steps:
+          - checkout: genericAuditingReporting
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks deployment stage"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameters_spSecret)"
+              resourceGroup: "$(stage_uks_rg)"
+              workspace: "$(stage_uks_workspace)"
+              subscriptionId: "$(stage_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: audit/sourceDataValidation/rdl
+              databricksPath: /audit/sourceDataValidation/rdl
+
+  ## Prod uks genericingestionframework scripts deployment
+  - stage: prod_uks_genericingestion_deployment
+    jobs:
+      - job: prod_uks_databricks_deployment
+        steps:
+          - checkout: genericingestionframework
+          - task: datathirstltd.databricksdeployscriptstasks.databricksdeployscriptstask.databricksdeployscripts@0
+            displayName: "databricks notebooks deployment prod"
+            inputs:
+              authmethod: serviceprincipal
+              applicationid: "$(spn_appid)"
+              spsecret: "$(Parameter_spSecretProd)"
+              resourcegroup: "$(prod_uks_rg)"
+              workspace: "$(prod_uks_workspace)"
+              subscriptionid: "$(prod_subscriptionid)"
+              tenantid: "$(tenant_id)"
+              region: uksouth
+              localpath: scripts/
+              databrickspath: /scripts
+
+  ## Prod UKS Jarvis Scripts  deployment
+  - stage: Prod_UKS_Jarvis_Scripts_Deployment
+    jobs:
+      - job: prod_uks_DatabricksJarvis_deployment
+        steps:
+          - checkout: jarvisrawvault
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Jarvis  Notebooks deployment Prod"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameter_spSecretProd)"
+              resourceGroup: "$(prod_uks_rg)"
+              workspace: "$(prod_uks_workspace)"
+              subscriptionId: "$(prod_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: rvCustomModules
+              databricksPath: /rvCustomModules               
+
+  ## Prod UKS Retail POS scripts deployment
+  - stage: Prod_UKS_Retail_POS_Deployment
+    jobs:
+      - job: prod_uks_Databricks_deployment
+        steps:
+          - checkout: 3party_scripts
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks Notebooks Retail POS deployment prod"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameter_spSecretProd)"
+              resourceGroup: "$(prod_uks_rg)"
+              workspace: "$(prod_uks_workspace)"
+              subscriptionId: "$(prod_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: retailPOS/pyspark-scripts
+              databricksPath: /3rdparty/retailPOS                
+        
+  ## Prod UKS genericAuditingReporting Scripts  deployment
+  - stage: Prod_UKS_genericAuditingReporting_Scripts_Deployment
+    jobs:
+      - job: prod_uks_genericAuditingReporting_deployment
+        steps:
+          - checkout: genericAuditingReporting
+          - task: DataThirstLtd.databricksDeployScriptsTasks.databricksDeployScriptsTask.databricksDeployScripts@0
+            displayName: "Databricks genericAuditingReporting Notebooks deployment Prod"
+            inputs:
+              authMethod: servicePrincipal
+              applicationId: "$(spn_appid)"
+              spSecret: "$(Parameter_spSecretProd)"
+              resourceGroup: "$(prod_uks_rg)"
+              workspace: "$(prod_uks_workspace)"
+              subscriptionId: "$(prod_subscriptionid)"
+              tenantId: "$(TENANT_ID)"
+              region: uksouth
+              localPath: audit/sourceDataValidation/rdl
+              databricksPath: /audit/sourceDataValidation/rdl        
